@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>fontDect</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+<style>
+	body {
+		color: #333;
+	}
+
+	.fontBox {
+		text-align: center;
+		margin: 20px 0 30px 0;
+	}
+
+	.fontBox input {
+		width: 200px;
+		height: 32px;
+		font-size: 18px;
+		padding-left: 8px;
+		border-radius: 16px;
+		border: 3px solid lightblue;
+		outline: none;
+	}
+
+	table {
+		margin: 0 auto;
+		width: 30%;
+		text-align: center;
+		margin-bottom: 30px;
+	}
+
+	table caption {
+		font-size: 25px;
+		font-weight: bolder;
+		padding: 20px;
+	}
+
+	table tr {
+		height: 32px;
+	}
+
+	table thead {
+		background: lightgrey;
+	}
+/* canvas {
+ 	border: 1px solid red;
+ }*/
+
+
+</style>
+</head>
+<body>
+
+	<table cellpadding="0" cellspacing="0">
+		<caption>中文字体</caption>
+		<thead>
+			<tr>
+				<th>中文名</th>
+				<th>系统</th>
+				<th>英文名</th>
+			</tr>
+		</thead>
+		<tbody id="tbody_zn"></tbody>
+	</table>
+
+	<table cellpadding="0" cellspacing="0">
+		<caption>英文字体</caption>
+		<thead>
+			<tr>
+				<th>英文名</th>
+			</tr>
+		</thead>
+		<tbody id="tbody_en"></tbody>
+	</table>
+<script src="http://code.jquery.com/jquery-1.9.0.js"></script>
+<script src="./fontDectec.js"></script>
+<script>
+
+	var fonts_zn = [
+		// MAC OS
+			{ "name_zn": "华文细黑", "system": "MAC OS", "name": "STHeiti Light [STXihei]" },
+			{ "name_zn": "华文黑体", "system": "MAC OS", "name": "STHeiti" },
+			{ "name_zn": "华文仿宋", "system": "MAC OS", "name": "STFangsong" },
+			{ "name_zn": "华文楷体", "system": "MAC OS", "name": "STKaiti" },
+			{ "name_zn": "华文宋体", "system": "MAC OS", "name": "STSong" },
+			{ "name_zn": "冬青黑体", "system": "MAC OS", "name": "Hiragino Sans GB" },
+			{ "name_zn": "黑体-简", "system": "MAC OS", "name": "Heiti SC" },
+			{ "name_zn": "楷体-简", "system": "MAC OS", "name": "Kaiti SC" },
+			{ "name_zn": "兰亭黑-简", "system": "MAC OS", "name": "Lantinghei SC" },
+			{ "name_zn": "翩翩体-简", "system": "MAC OS", "name": "HanziPen SC" },
+			{ "name_zn": "手扎体-简", "system": "MAC OS", "name": "Hannotate SC" },
+			{ "name_zn": "宋体-简", "system": "MAC OS", "name": "Songti SC" },
+			{ "name_zn": "圆体-简", "system": "MAC OS", "name": "Yuanti SC" },
+			{ "name_zn": "标楷体",  "system": "MAC OS", "name": "BiauKai" },
+			{ "name_zn": "丽黑 Pro","system": "MAC OS", "name": "LiHei Pro Medium" },
+			{ "name_zn": "丽宋 Pro","system": "MAC OS", "name": "LiSong Pro Light" },
+			
+
+
+		// Windows
+			{ "name_zn": "宋体", "system": "Windows", "name":"SimSun" },
+			{ "name_zn": "新宋体", "system": "Windows", "name": "NSimSun" },
+			{ "name_zn": "仿宋", "system": "Windows", "name": "FangSong" },
+			{ "name_zn": "新细明体", "system": "Windows", "name": "PMingLiU" },
+			{ "name_zn": "细明体", "system": "Windows", "name": "MingLiU" },
+			{ "name_zn": "黑体", "system": "Windows", "name":"SimHei" },
+			{ "name_zn": "标楷体", "system": "Windows", "name":"DFKai-SB" },
+			{ "name_zn": "楷体_GB2312", "system": "Windows", "name": "KaiTi_GB2312" },
+			{ "name_zn": "仿宋_GB2312", "system": "Windows", "name": "FangSong_GB2312" },
+			{ "name_zn": "微软正黑体", "system": "Windows", "name": "Microsoft JhengHei" },
+			{ "name_zn": "微软雅黑", "system": "Windows",  "name": "Microsoft YaHei" }
+		
+		],
+		fonts_en = [
+			{ "name": "cursive" }, 
+			{ "name": "fantasy" },
+			{ "name": "default" },
+			{ "name": "Arial" },
+			{ "name": "Arial Black" },
+			{ "name": "Arial Narrow" },
+			{ "name": "Arial Rounded MT Bold" },
+			{ "name": "Bookman Old Style" },
+			{ "name": "Bradley Hand ITC" },
+			{ "name": "Comic Sans MS" },
+			{ "name": "Courier" },
+			{ "name": "Georgia" },
+			{ "name": "Gentium" },
+			{ "name": "Impact" },
+			{ "name": "King" },
+			{ "name": "Lucida Console" },
+			{ "name": "Lalit" },
+			{ "name": "Tahoma" },
+			{ "name": "TeX" },
+			{ "name": "Times" },
+			{ "name": "Times New Roman" },
+			{ "name": "Trebuchet MS" },
+			{ "name": "Verdana" },
+			{ "name": "Verona"}
+		];
+
+	var dom = {
+		fzn: function(data) {
+			var html = "";
+			for(var i = 0, len = data.length; i < len; i++) {
+				html += '<tr>' + 
+						'<td style=" color:' + (data[i]["dected"] ? "green" : "red") + '; font-family:' + data[i]["name"] + ';">' + data[i]["name_zn"] + '</td>' +
+						'<td>' + data[i]["system"] + '</td>' +
+						'<td>' + data[i]["name"] + '</td>'
+						'</tr>';
+			}
+			return html;
+		},
+
+		fen: function(data) {
+			var html = "";
+			for(var i = 0, len = data.length; i < len; i++) {
+				html += '<tr>' + 
+						'<td style="color:' + (data[i]["dected"] ? "green" : "red") + '; font-family:' + data[i]["name"] + ';">' + data[i]["name"] + '</td>' +
+						'</tr>';
+			}
+			return html;
+		}
+	};
+
+	var test = new FontDetect();
+
+
+	for (var i = 0, ilen = fonts_zn.length; i < ilen; i++ ) {
+		fonts_zn[i]["dected"] = test.detect([ fonts_zn[i]["name"], fonts_zn[i]["name_zn"] ]);
+	}
+	$("#tbody_zn").append(dom.fzn(fonts_zn));
+
+
+	for (var j = 0, jlen = fonts_en.length; j < jlen; j++) {
+		fonts_en[j]["dected"] = test.detect([ fonts_en[j]["name"] ]);
+	}
+	$("#tbody_en").append(dom.fen(fonts_en));
+
+	//console.log(test.detect(['cursive']))
+
+</script>
+</body>
+</html>
